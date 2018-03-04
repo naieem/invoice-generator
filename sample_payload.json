@@ -1,0 +1,27 @@
+{
+    "invoice_info": {
+        "invoice_number": "4",
+        "customer_name": "Naieem Mahmud Supto",
+        "currency": "$",
+        "hourlyRate": 12,
+        "tasklist": [{
+                "title": "task number1",
+                "timeHours": 2,
+                "timeMins": 45,
+                "taskDate": "02.02.2018"
+            },
+            {
+                "title": "task number2",
+                "timeHours": 32,
+                "timeMins": 15,
+                "taskDate": "02.02.2018"
+            },
+            {
+                "title": "task number3",
+                "timeHours": 5,
+                "timeMins": 5,
+                "taskDate": "02.02.2018"
+            }
+        ]
+    }
+}

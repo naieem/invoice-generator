@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+        * {
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        body {
+            width: 80%;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .row {
+            float: left;
+            width: 100%;
+            padding: 20px 0 0;
+        }
+        
+        .left {
+            float: left;
+        }
+        
+        .right {
+            float: right;
+        }
+        
+        .half {
+            width: 45%;
+        }
+        
+        .full-width {
+            width: 100%;
+        }
+        
+        .text-left {
+            text-align: left;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .name {
+            padding: 20px 0;
+        }
+        
+        .invoice_title {
+            padding: 20px 0;
+            line-height: 30px;
+            font-size: 38px;
+            text-transform: uppercase;
+        }
+        
+        .bill_information_in_details {
+            padding: 20px 0;
+        }
+        
+        .order_class {
+            padding: 20px 0;
+        }
+        
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="row">
+        <div class="name left half">
+            <h3>Bill By:</h3>
+            <h5>{{customer_name}}</h5>
+        </div>
+        <div class="invoice_title right half text-right">
+            <h5>Invoice #{{invoice_number}}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="billing_address left half">
+            <h3>Bill To:</h3>
+            <p>Acxcom inc.</p>
+            <p>1231 des Cèdres</p>
+            <p>Les Cèdres, QC</p>
+            <p>Canada J7T 1H3</p>
+        </div>
+        <div class="bill_details right half text-right">
+            <p><strong>Date:</strong><span>{{invoice_date}}</span></p>
+            <p><strong>Due Date:</strong><span>{{invoice_date}}</span></p>
+            <p><strong>Balance Due:</strong><span>{{currency}}{{totalAmount}}</span></p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="bill_information_in_details left full-width">
+            <table>
+                <tr>
+                    <th>Task List</th>
+                    <th>Time</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                </tr>
+                {{#tasklist}}
+                <tr>
+                    <td>{{title}} on {{taskDate}}</td>
+                    <td>{{timeHours}} hr {{timeMins}} mins</td>
+                    <td>{{currency}}{{hourlyRate}}</td>
+                    <td>{{currency}}{{subAmount}}</td>
+                </tr>
+                {{/tasklist}}
+
+            </table>
+        </div>
+    </div>
+
+    <!-- <div class="row">
+        <div class="order_class right">
+            <p><strong>Total:</strong><span>{{currency}}{{totalAmount}}</span></p>
+        </div>
+    </div> -->
+</body>
+
+</html>
