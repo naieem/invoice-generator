@@ -1,12 +1,18 @@
 var express = require('express');
 var router = express.Router();
-var Mustache = require('mustache');
+var Mustache = require('mustache'); // binding dynamic data in html
 var fs = require('fs');
 var pdf = require('html-pdf');
-var options = { format: 'Letter' };
-var faker = require('faker');
-/* GET home page. */
-router.post('/', function(req, res, next) {
+var options = { format: 'Letter' }; // invoice generating config
+var faker = require('faker'); // dummy text generator
+
+
+/**
+ * generating pdf invoice
+ * api:"invoice/create/"
+ * @param obj
+ */
+router.post('/create', function(req, res, next) {
     var html = fs.readFileSync('./template/invoice.html', 'utf8');
     var totalAmount = calculateTotalAmount(req.body.invoice_info.tasklist, req.body.invoice_info.hourlyRate);
     req.body.invoice_info.totalAmount = totalAmount; // getting total amont
@@ -20,13 +26,20 @@ router.post('/', function(req, res, next) {
         return result;
     }
     var html = Mustache.render(html, req.body.invoice_info);
+    // uid for individual pdfs
     var uid = faker.random.uuid();
+    // generating pdf function
     pdf.create(html, options).toFile('./pdfs/invoice_' + uid + '.pdf', function(err, response) {
         if (err) return console.log(err);
         console.log(response);
         res.json(response);
     });
 });
+
+/**
+ * calculating total amount
+ * @param [list of task,hourlyrate]
+ */
 
 function calculateTotalAmount(list, hourlyRate) {
     var result = 0;
