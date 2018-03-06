@@ -5,7 +5,9 @@ var fs = require('fs');
 var pdf = require('html-pdf');
 var options = { format: 'Letter' }; // invoice generating config
 var faker = require('faker'); // dummy text generator
-
+const axios = require('axios'); // for making http call
+var pcloudSdk = require('pcloud-sdk-js'); // pcloud js sdk
+var client = pcloudSdk.createClient(null, 'pcloud'); // initializing pcloud client
 
 /**
  * generating pdf invoice
@@ -32,10 +34,87 @@ router.post('/create', function(req, res, next) {
     pdf.create(html, options).toFile('./pdfs/invoice_' + uid + '.pdf', function(err, response) {
         if (err) return console.log(err);
         console.log(response);
-        res.json(response);
+        upload(response.filename);
+        // res.json(response);
     });
 });
 
+/**
+ * login in pcloud for storing the file 
+ * api:"invoice/login/"
+ * @returns {returns}
+ */
+router.post('/login', function(req, res, next) {
+    var email = req.body.email;
+    var password = req.body.password;
+    getUserInformation(email, password).then(response => {
+        console.log(response);
+        // res.json({
+        //     userInformation: response
+        // });
+    }, error => {
+        // res.json({
+        //     erro: error
+        // });
+    }).catch(function(error) {
+        console.log(error);
+    });
+    // client.login(email, password).then(function(response) {
+    //     
+    //     getUserInformation(response).then(res => {
+    //         
+    //         res.json({
+    //             authToken: response,
+    //             userInformation: res
+    //         });
+    //     }, error => {
+    //         res.json({
+    //             authToken: response,
+    //             error: error
+    //         });
+    //     });
+    // }, function(err) {
+    //     
+    //     res.json({
+    //         error: err
+    //     });
+    // });
+});
+
+function upload(file) {
+    // client.login("naieemsupto@gmail.com", "1qazZAQ!2wsxXSW@").then(function(response) {
+    //     
+    //     uploadFile(file);
+    //     // res.json({
+    //     //     auth_token: response
+    //     // });
+    // }, function(err) {
+    //     
+    //     // res.json({
+    //     //     error: err
+    //     // });
+    // });
+    uploadFile(file);
+}
+
+function uploadFile(file) {
+    client.upload(file, 0, {
+        onBegin: function() {
+            console.log('Upload started.');
+        },
+        onProgress: function(progress) {
+            console.log(progress.direction, progress.loaded, progress.total);
+        },
+        onFinish: function(uploadData) {
+
+            console.log(uploadData);
+        }
+    });
+}
+
+function getUserInformation(email, password) {
+    return axios.get("https://api.pcloud.com/userinfo?getauth=1&logout=1&username=" + email + "&password=" + password);
+}
 /**
  * calculating total amount
  * @param [list of task,hourlyrate]
