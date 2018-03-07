@@ -1,21 +1,25 @@
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
 const axios = require('axios'); // for making http call
 const message = require('../shared/message'); // success and error message texts
 const defaultHost = 'https://api.pcloud.com/';
+var pcloudConfig = JSON.parse(fs.readFileSync('./pcloudconfig.json', 'utf8')); // getting pccloud login information
+
 
 /**
- * login in pcloud for storing the file 
+ * login in pcloud for getting auth token
  * api:"pcloud/login"
  * params:email,password
  * @returns {returns}
  */
 router.post('/login', function(req, res, next) {
-    var email = req.body.email;
-    var password = req.body.password;
+    var email = pcloudConfig.email;
+    var password = pcloudConfig.password;
     if (email && password) {
         login(email, password).then(response => {
             if (response.data.result == 0) {
+                // client = pCloudSdk.createClient(token);
                 res.json({
                     access_token: response.data.auth,
                     clientInfo: response.data
@@ -42,9 +46,9 @@ router.post('/login', function(req, res, next) {
 });
 
 /**
- * login in pcloud for storing the file 
- * api:"pcloud/login"
- * @returns {route params}
+ * getting list of all files in an individual folder 
+ * api:"pcloud/getfoldercontents"
+ * @returns {all  folders details}
  */
 router.post('/getfoldercontents', function(req, res, next) {
 
@@ -70,35 +74,81 @@ router.post('/getfoldercontents', function(req, res, next) {
     }
 });
 
-
 /**
  * Uploading and saving file to pcloud storage
  * api:"pcloud/uploadFile"
  * @returns {route params}
  */
-router.post('/uploadFile', function(req, res, next) {
-    var file = req.body.file;
-    var token = req.headers.authorization;
-    var folderid = req.body.folderid;
-    if (!file) {
-        res.json({
-            error: message.error.uploadfile.no_file
-        });
-    } else if (!token) {
-        res.json({
-            error: message.error.token.not_provided
-        });
-    } else {
-        folderid = folderid ? folderid : '0';
-        upload(file, token, folderid).then(result => {
-            debugger;
-        }, error => {
-            debugger;
-        }).catch(error => {
-            debugger;
-        });
-    }
-});
+// router.post('/uploadFile', function(req, res, next) {
+//     var file = req.body.file;
+//     var token = req.headers.authorization;
+//     var folderid = req.body.folderid;
+//     client.login('naieemsupto@gmail.com', '1qazZAQ!2wsxXSW@').then(result => {
+//         debugger;
+//         // console.log(files);
+//         // client.getfilelink('1489109836').then(res => {
+//         //     debugger;
+//         // }, error => {
+//         //     debugger;
+//         // }).catch(err => {
+//         //     debugger;
+//         // });
+//         client.remoteupload(file, 0, {
+//             onBegin: function() {
+//                 console.log('Upload started.');
+//             },
+//             onProgress: function(progress) {
+//                 console.log(progress);
+//             },
+//             onFinish: function(uploadData) {
+//                 console.log(uploadData);
+//             }
+//         }).then(res => {
+//             debugger;
+//         }, err => {
+//             debugger;
+//         }).catch(error => {
+//             debugger;
+//         });
+//     });
+//     // if (!file) {
+//     //     res.json({
+//     //         error: message.error.uploadfile.no_file
+//     //     });
+//     // } else if (!token) {
+//     //     res.json({
+//     //         error: message.error.token.not_provided
+//     //     });
+//     // } else {
+//     //     folderid = folderid ? folderid : '0';
+//     //     upload(file, token, folderid).then(result => {
+//     //         debugger;
+//     //     }, error => {
+//     //         debugger;
+//     //     }).catch(error => {
+//     //         debugger;
+//     //     });
+//     // }
+//     // client = pCloud.createClient(token);
+//     // consumer.userinfo().then(result => {
+//     //     debugger;
+//     // }, error => {
+//     //     debugger;
+//     // }).catch(error => {
+//     //     debugger;
+//     // });
+//     // client.remoteupload(file, 0, {
+//     //     onBegin: function() {
+//     //         console.log('Upload started.');
+//     //     },
+//     //     onProgress: function(progress) {
+//     //         console.log(progress);
+//     //     },
+//     //     onFinish: function(uploadData) {
+//     //         console.log(uploadData);
+//     //     }
+//     // });
+// });
 
 /**
  * Uploading and saving file to pcloud storage
@@ -171,25 +221,103 @@ router.post('/deletefolder', function(req, res, next) {
     }
 });
 
-
-function upload(file, token, folderid) {
-
-    var action = "uploadfile";
-    folderid = folderid ? folderid : 0;
-    return uploadFile(file, token, folderid, action);
-}
-
-function uploadFile(file, token, folderid, action) {
-    var params = {
-        folderid: folderid,
-        filename: file
+/**
+ * Get files download link
+ * api:"pcloud/getfilelink"
+ * params{token,foldername}
+ * @returns {route params}
+ */
+router.post('/getfilelink', function(req, res, next) {
+    var token = req.headers.authorization;
+    var fileid = req.body.fileid;
+    if (!token) {
+        res.json({
+            error: message.error.token.not_provided
+        });
+    } else if (!fileid) {
+        res.json({
+            error: message.error.file.id_empty
+        });
+    } else {
+        getfilelink(token, fileid).then(result => {
+            res.json({
+                response: result.data.hosts[0] + result.data.path
+            });
+        }, error => {
+            res.json({
+                error: error
+            });
+        }).catch(error => {
+            res.json({
+                error: error
+            });
+        });
     }
-    var url = makeRouteConfiguration(action, params, token);
-    return axios.post(url);
-}
+});
+
+/**
+ * Get files publick downloadable link
+ * this is very well decorated rather just download link
+ * api:"pcloud/getfilepublink"
+ * params{token,fileid}
+ * @returns {route params}
+ */
+router.post('/getfilepublink', function(req, res, next) {
+    var token = req.headers.authorization;
+    var fileid = req.body.fileid;
+    if (!token) {
+        res.json({
+            error: message.error.token.not_provided
+        });
+    } else if (!fileid) {
+        res.json({
+            error: message.error.file.id_empty
+        });
+    } else {
+        getfilepublink(token, fileid).then(result => {
+            res.json({
+                response: result.data
+            });
+        }, error => {
+            res.json({
+                error: error
+            });
+        }).catch(error => {
+            res.json({
+                error: error
+            });
+        });
+    }
+});
 
 
 //----------------------- Corresponding functions of route start ------------------------//
+
+/**
+ * Getting download link by fileid 
+ * @params {token,folderid:int} 
+ * @returns {promise}
+ */
+function getfilepublink(token, fileid) {
+    var params = {
+        fileid: fileid
+    }
+    var url = makeRouteConfiguration('getfilepublink', params, token);
+    return axios.get(url);
+}
+
+/**
+ * Getting public download link by fileid 
+ * @params {token,folderid:int} 
+ * @returns {promise}
+ */
+function getfilelink(token, fileid) {
+    var params = {
+        fileid: fileid
+    }
+    var url = makeRouteConfiguration('getfilelink', params, token);
+    return axios.get(url);
+}
 
 /**
  * Deleting a folder by folder id 
@@ -264,4 +392,4 @@ function makeRouteConfiguration(action, parameter, token) {
     return result;
 }
 module.exports = router;
-module.exports.upload = upload;
+// module.exports.upload = upload;

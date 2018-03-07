@@ -7,7 +7,10 @@ var options = { format: 'Letter' }; // invoice generating config
 var faker = require('faker'); // dummy text generator
 const axios = require('axios'); // for making http call
 const message = require('../shared/message'); // success and error message texts
-var pcloud = require('./pcloud');
+// var pcloud = require('./pcloud');
+const pCloud = require('pcloud-sdk-js');
+var client = pCloud.createClient(null, 'pcloud');
+var pcloudConfig = JSON.parse(fs.readFileSync('./pcloudconfig.json', 'utf8')); // getting pccloud login information
 
 /**
  * generating pdf invoice
@@ -34,22 +37,31 @@ router.post('/create', function(req, res, next) {
     // generating pdf function
     pdf.create(html, options).toFile('./pdfs/invoice_' + uid + '.pdf', function(err, response) {
         if (err) return console.log(err);
-        // console.log(pcloud);
-        if (token) {
-            pcloud.upload(response.filename, token).then(result => {
-                debugger;
-                res.json(result);
-            }, error => {
-                debugger;
-                res.json(error);
+        console.log(response);
+        loginPcloud().then(function(result) {
+            uploadFile(response.filename).then(result => {
+                res.json({
+                    fileInformation: result
+                });
+            }, er => {
+                res.json({
+                    error: er
+                });
             }).catch(error => {
-                debugger;
-                res.json(error);
+                res.json({
+                    error: error
+                });
             });
-        } else {
-            response.error = message.error.uploadfile.no_token
-            res.json(response);
-        }
+        }).catch(function(e) {
+            console.log(e);
+            res.json({
+                error: e
+            });
+        });
+    }, function(err) {
+        res.json({
+            error: err
+        });
     });
 });
 
@@ -68,4 +80,31 @@ function calculateTotalAmount(list, hourlyRate) {
     return result;
 }
 
+/**
+ * Login to pcloud before uploading file to there
+ * @param obj
+ */
+function loginPcloud() {
+    return client.login(pcloudConfig.email, pcloudConfig.password);
+}
+
+/**
+ * Upload file to pcloud storage
+ * @params {localfileurl}
+ * @param obj
+ */
+function uploadFile(fileurl) {
+    return client.upload(fileurl, 0, {
+        onBegin: function() {
+            console.log('Upload started.');
+        },
+        onProgress: function(progress) {
+            console.log(progress.direction, progress.loaded, progress.total);
+        },
+        onFinish: function(uploadData) {
+            console.log(uploadData);
+            return uploadData;
+        }
+    });
+}
 module.exports = router

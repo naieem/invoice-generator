@@ -13,6 +13,9 @@ var message = {
         folder: {
             name_empty: "Folder name can not be empty",
             id_empty: "Folder Id can not be empty"
+        },
+        file: {
+            id_empty: "File id can not be empty"
         }
     }
 }
