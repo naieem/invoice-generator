@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 var index = require('./routes/index');
 var users = require('./routes/users');
+var pcloud = require('./routes/pcloud');
 
 var app = express();
 // enabling cors
@@ -23,8 +24,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/invoice', index);
+app.use('/invoice', index); // invoice apis
 app.use('/users', users);
+
+app.use('/pcloud', pcloud); // pcloud apis
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
