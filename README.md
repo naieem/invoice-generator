@@ -76,7 +76,7 @@ Templates for pdf will be found in the template folder
 ### Get files download link
 
  * api:"pcloud/getfilelink"
- * params{token,foldername}
+ * params{token,fileid}
 
 ### Get files publicly downloadable link. this is very well decorated rather just download link
 
