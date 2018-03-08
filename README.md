@@ -68,7 +68,7 @@ Templates for pdf will be found in the template folder
  * api:"pcloud/createfolder"
  * params{token,foldername}
 
-### Uploading and saving file to pcloud storage
+### Deleting folder from pcloud storage
 
  * api:"pcloud/deletefolder"
  * params{token,foldername}

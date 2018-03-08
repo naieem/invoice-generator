@@ -113,7 +113,7 @@ router.post('/createfolder', function(req, res, next) {
 
 
 /**
- * Uploading and saving file to pcloud storage
+ * Deleting folder from pcloud storage
  * api:"pcloud/deletefolder"
  * params{token,folderid}
  * @returns {route params}
