@@ -48,6 +48,7 @@ router.post('/login', function(req, res, next) {
 /**
  * getting list of all files in an individual folder 
  * api:"pcloud/getfoldercontents"
+ * params:folderid
  * @returns {all  folders details}
  */
 router.post('/getfoldercontents', function(req, res, next) {
@@ -73,82 +74,6 @@ router.post('/getfoldercontents', function(req, res, next) {
         });
     }
 });
-
-/**
- * Uploading and saving file to pcloud storage
- * api:"pcloud/uploadFile"
- * @returns {route params}
- */
-// router.post('/uploadFile', function(req, res, next) {
-//     var file = req.body.file;
-//     var token = req.headers.authorization;
-//     var folderid = req.body.folderid;
-//     client.login('naieemsupto@gmail.com', '1qazZAQ!2wsxXSW@').then(result => {
-//         debugger;
-//         // console.log(files);
-//         // client.getfilelink('1489109836').then(res => {
-//         //     debugger;
-//         // }, error => {
-//         //     debugger;
-//         // }).catch(err => {
-//         //     debugger;
-//         // });
-//         client.remoteupload(file, 0, {
-//             onBegin: function() {
-//                 console.log('Upload started.');
-//             },
-//             onProgress: function(progress) {
-//                 console.log(progress);
-//             },
-//             onFinish: function(uploadData) {
-//                 console.log(uploadData);
-//             }
-//         }).then(res => {
-//             debugger;
-//         }, err => {
-//             debugger;
-//         }).catch(error => {
-//             debugger;
-//         });
-//     });
-//     // if (!file) {
-//     //     res.json({
-//     //         error: message.error.uploadfile.no_file
-//     //     });
-//     // } else if (!token) {
-//     //     res.json({
-//     //         error: message.error.token.not_provided
-//     //     });
-//     // } else {
-//     //     folderid = folderid ? folderid : '0';
-//     //     upload(file, token, folderid).then(result => {
-//     //         debugger;
-//     //     }, error => {
-//     //         debugger;
-//     //     }).catch(error => {
-//     //         debugger;
-//     //     });
-//     // }
-//     // client = pCloud.createClient(token);
-//     // consumer.userinfo().then(result => {
-//     //     debugger;
-//     // }, error => {
-//     //     debugger;
-//     // }).catch(error => {
-//     //     debugger;
-//     // });
-//     // client.remoteupload(file, 0, {
-//     //     onBegin: function() {
-//     //         console.log('Upload started.');
-//     //     },
-//     //     onProgress: function(progress) {
-//     //         console.log(progress);
-//     //     },
-//     //     onFinish: function(uploadData) {
-//     //         console.log(uploadData);
-//     //     }
-//     // });
-// });
 
 /**
  * Uploading and saving file to pcloud storage
