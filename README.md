@@ -2,10 +2,6 @@
 
 Generating invoice from html file
 
-## Api
-
-/invoice/create
-
 ### Template file
 
 Predefined template file will be converted into pdf content
