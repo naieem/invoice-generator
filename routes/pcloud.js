@@ -149,7 +149,7 @@ router.post('/deletefolder', function(req, res, next) {
 /**
  * Get files download link
  * api:"pcloud/getfilelink"
- * params{token,foldername}
+ * params{token,fileid}
  * @returns {route params}
  */
 router.post('/getfilelink', function(req, res, next) {
